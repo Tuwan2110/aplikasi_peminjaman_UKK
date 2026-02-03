@@ -1,7 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:aplikasi_peminjaman/dashboard_screen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart'; // Wajib ada
+import 'dashboard_screen.dart';
 
-void main() {
+// 1. Deklarasikan Supabase secara GLOBAL di sini agar bisa dipakai semua file
+final supabase = Supabase.instance.client;
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // 2. Masukkan URL dan ANON KEY Supabase Mas di sini
+  await Supabase.initialize(
+    url: 'URL_SUPABASE_MAS_DI_SINI',
+    anonKey: 'ANON_KEY_MAS_DI_SINI',
+  );
+
   runApp(const MyApp());
 }
 
@@ -68,7 +80,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
                 const Text('Teknik Otomotif', 
                   style: TextStyle(fontSize: 14, color: Colors.white70)),
-                const SizedBox(height: 40), // Jarak ke kotak putih
+                const SizedBox(height: 40),
                 Container(
                   padding: const EdgeInsets.all(28),
                   decoration: BoxDecoration(
@@ -90,11 +102,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         const Text('Login', 
                           style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 25),
-                        
-                        // Kolom NIM/NIP
                         const Text('NIM/NIP', 
                           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black87)),
-                        const SizedBox(height: 8), // Jarak teks ke kolom
+                        const SizedBox(height: 8),
                         TextFormField(
                           controller: _nimNipController,
                           decoration: InputDecoration(
@@ -104,14 +114,12 @@ class _LoginScreenState extends State<LoginScreen> {
                             contentPadding: const EdgeInsets.symmetric(vertical: 15),
                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                           ),
+                          validator: (value) => value!.isEmpty ? 'ID tidak boleh kosong' : null,
                         ),
-                        
-                        const SizedBox(height: 20), // Jarak antar input
-                        
-                        // Kolom Kata Sandi
+                        const SizedBox(height: 20),
                         const Text('Kata Sandi', 
                           style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black87)),
-                        const SizedBox(height: 8), // Jarak teks ke kolom
+                        const SizedBox(height: 8),
                         TextFormField(
                           controller: _passwordController,
                           obscureText: true,
@@ -123,9 +131,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                           ),
                         ),
-                        
-                        const SizedBox(height: 35), // Jarak ke tombol
-                        
+                        const SizedBox(height: 35),
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
@@ -199,7 +205,6 @@ class RoleSelectionScreen extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text('Masuk Sebagai : $id', style: TextStyle(color: Colors.grey[600])),
                     const SizedBox(height: 25),
-                    
                     Expanded(
                       child: SingleChildScrollView(
                         child: Column(
@@ -227,7 +232,13 @@ class RoleSelectionScreen extends StatelessWidget {
 
   Widget _buildRoleCard(BuildContext context, String title, String subtitle, Color color, IconData icon) {
     return GestureDetector(
-      onTap: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const DashboardScreen())),
+      onTap: () => Navigator.pushReplacement(
+        context, 
+        MaterialPageRoute(
+          // Fix: Kirim title sebagai role, dan id sebagai username
+          builder: (context) => DashboardScreen(role: title, username: id)
+        )
+      ),
       child: Container(
         margin: const EdgeInsets.only(bottom: 15),
         padding: const EdgeInsets.all(18),
